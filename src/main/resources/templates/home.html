@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+    <title>Pogodynka</title>
+  </head>
+  <body>
+    <header>
+      <form action="\" th:object="${search}" method="get">
+        <input
+          type="search"
+          th:field="*{city}"
+          placeholder="Wyszukaj miasto..."
+        />
+      </form>
+    </header>
+    <main>
+      <div class="main-container">
+        <div class="top">
+          <h3 class="city" th:text="${lonlat?.name ?: '-----'}"></h3>
+          <h4
+            class="degrees"
+            th:utext="${weatherData?.current?.temperature_2m != null ? weatherData.current.temperature_2m + '&#8451;' : '---'}"
+          ></h4>
+          <div>
+            <p
+              class="emojiBig"
+              th:if="${weatherData?.current?.rain == null || weatherData?.current?.snowfall == null || weatherData?.current?.cloud_cover == null}"
+            >
+              ---
+            </p>
+
+            <p
+              class="emojiBig"
+              th:if="${weatherData?.current?.snowfall > 0 && weatherData?.current?.rain > 0 && weatherData?.current?.snowfall > weatherData?.current?.rain}"
+            >
+              &#x1F328;&#xFE0F;
+            </p>
+            <p
+              class="emojiBig"
+              th:if="${weatherData?.current?.snowfall > 0 && weatherData?.current?.rain > 0 && weatherData?.current?.rain >= weatherData?.current?.snowfall && weatherData?.current?.cloud_cover > 50}"
+            >
+              &#x1F327;&#xFE0F;
+            </p>
+            <p
+              class="emojiBig"
+              th:if="${weatherData?.current?.snowfall > 0 && weatherData?.current?.rain > 0 && weatherData?.current?.rain >= weatherData?.current?.snowfall && weatherData?.current?.cloud_cover <= 50}"
+            >
+              &#x1F326;&#xFE0F;
+            </p>
+
+            <p
+              class="emojiBig"
+              th:if="${weatherData?.current?.snowfall > 0 && weatherData?.current?.rain == 0}"
+            >
+              &#x1F328;&#xFE0F;
+            </p>
+
+            <p
+              class="emojiBig"
+              th:if="${weatherData?.current?.rain > 0 && weatherData?.current?.snowfall == 0 && weatherData?.current?.cloud_cover > 50}"
+            >
+              &#x1F327;&#xFE0F;
+            </p>
+            <p
+              class="emojiBig"
+              th:if="${weatherData?.current?.rain > 0 && weatherData?.current?.snowfall == 0 && weatherData?.current?.cloud_cover <= 50}"
+            >
+              &#x1F326;&#xFE0F;
+            </p>
+
+            <p
+              class="emojiBig"
+              th:if="${weatherData?.current?.rain == 0 && weatherData?.current?.snowfall == 0 && weatherData?.current?.cloud_cover >= 75}"
+            >
+              &#x2601;&#xFE0F;
+            </p>
+            <p
+              class="emojiBig"
+              th:if="${weatherData?.current?.rain == 0 && weatherData?.current?.snowfall == 0 && weatherData?.current?.cloud_cover >= 50 && weatherData?.current?.cloud_cover < 75}"
+            >
+              &#x1F325;&#xFE0F;
+            </p>
+            <p
+              class="emojiBig"
+              th:if="${weatherData?.current?.rain == 0 && weatherData?.current?.snowfall == 0 && weatherData?.current?.cloud_cover >= 25 && weatherData?.current?.cloud_cover < 50}"
+            >
+              &#x1F324;&#xFE0F;
+            </p>
+            <p
+              class="emojiBig"
+              th:if="${weatherData?.current?.rain == 0 && weatherData?.current?.snowfall == 0 && weatherData?.current?.cloud_cover < 25}"
+            >
+              &#x2600;&#xFE0F;
+            </p>
+          </div>
+
+          <p
+            class="clouds"
+            th:utext="${weatherData?.current?.cloud_cover != null ? 
+    (weatherData.current.cloud_cover >= 88 ? 'Całkowite zachmurzenie' : 
+     weatherData.current.cloud_cover >= 70 ? 'Duże zachmurzenie' : 
+     weatherData.current.cloud_cover >= 45 ? 'Umiarkowane zachmurzenie' : 
+     weatherData.current.cloud_cover >= 13 ? 'Lekkie zachmurzenie' : 
+     'Bezchmurnie') : '---'}"
+          ></p>
+        </div>
+        <div class="mid">
+          <div>
+            <p
+              th:utext="${weatherData?.current?.apparent_temperature != null ? 'Temperatura odczuwalna: ' + weatherData?.current?.apparent_temperature + '&#8451;' : 'Temperatura odczuwalna: ---'}"
+            ></p>
+            <p
+              th:utext="${weatherData?.current?.relative_humidity_2m != null ? 'Wilgotność powietrza: ' + weatherData?.current?.relative_humidity_2m + '%' : 'Wilgotność powietrza: ---'}"
+            ></p>
+            <p
+              th:utext="${weatherData?.current?.surface_pressure != null ? 'Ciśnienie: ' + weatherData?.current?.surface_pressure + ' hPa' : 'Ciśnienie: ---'}"
+            ></p>
+            <p
+              th:utext="${weatherData?.current?.wind_speed_10m != null ? 'Prędkość wiatru: ' + weatherData?.current?.wind_speed_10m + ' km/h' : 'Prędkość wiatru: ---'}"
+            ></p>
+          </div>
+        </div>
+        <div class="bot">
+          <div class="today">
+            <p>Dzisiaj</p>
+            <p
+              class="cloud"
+              th:utext="${weatherData?.daily?.cloud_cover_mean != null && weatherData.daily.cloud_cover_mean.length > 0 ? 
+        (weatherData.daily.cloud_cover_mean[0] >= 75 ? '&#x2601;&#xFE0F;' : 
+         weatherData.daily.cloud_cover_mean[0] >= 50 ? '&#x1F325;&#xFE0F;' : 
+         weatherData.daily.cloud_cover_mean[0] >= 25 ? '&#x1F324;&#xFE0F;' : 
+         '&#x2600;&#xFE0F;') : '---'}"
+            ></p>
+            <p
+              th:utext="${weatherData?.daily?.temperature_2m_mean != null && weatherData.daily.temperature_2m_mean.length > 0 ? 
+        weatherData.daily.temperature_2m_mean[0] + '&#8451;' : '---'}"
+            ></p>
+          </div>
+          <div class="tomorrow">
+            <p>Jutro</p>
+            <p
+              class="cloud"
+              th:utext="${weatherData?.daily?.cloud_cover_mean != null && weatherData.daily.cloud_cover_mean.length > 1 ? 
+        (weatherData.daily.cloud_cover_mean[1] >= 75 ? '&#x2601;&#xFE0F;' : 
+         weatherData.daily.cloud_cover_mean[1] >= 50 ? '&#x1F325;&#xFE0F;' : 
+         weatherData.daily.cloud_cover_mean[1] >= 25 ? '&#x1F324;&#xFE0F;' : 
+         '&#x2600;&#xFE0F;') : '---'}"
+            ></p>
+            <p
+              th:utext="${weatherData?.daily?.temperature_2m_mean != null && weatherData.daily.temperature_2m_mean.length > 1 ? 
+        weatherData.daily.temperature_2m_mean[1] + '&#8451;' : '---'}"
+            ></p>
+          </div>
+          <div class="2d">
+            <p>Pojutrze</p>
+            <p
+              class="cloud"
+              th:utext="${weatherData?.daily?.cloud_cover_mean != null && weatherData.daily.cloud_cover_mean.length > 2 ? 
+        (weatherData.daily.cloud_cover_mean[2] >= 75 ? '&#x2601;&#xFE0F;' : 
+         weatherData.daily.cloud_cover_mean[2] >= 50 ? '&#x1F325;&#xFE0F;' : 
+         weatherData.daily.cloud_cover_mean[2] >= 25 ? '&#x1F324;&#xFE0F;' : 
+         '&#x2600;&#xFE0F;') : '---'}"
+            ></p>
+            <p
+              th:utext="${weatherData?.daily?.temperature_2m_mean != null && weatherData.daily.temperature_2m_mean.length > 2 ? 
+        weatherData.daily.temperature_2m_mean[2] + '&#8451;' : '---'}"
+            ></p>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <a href="https://github.com/Toster1132" target="_blank"
+        >Zrobione dla zwały</a
+      >
+    </footer>
+  </body>
+</html>
